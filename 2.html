@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .stopwatch-container {
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .time {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .buttons {
+            margin-top: 10px;
+        }
+        .button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .button.start {
+            background-color: #28a745;
+        }
+        .button.pause {
+            background-color: #ffc107;
+        }
+        .button.resume {
+            background-color: #17a2b8;
+        }
+        .button.reset {
+            background-color: #dc3545;
+        }
+        .button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="stopwatch-container">
+        <div id="display" class="time">00:00:00</div>
+        <div class="buttons">
+            <button class="button start" onclick="start()">Start</button>
+            <button class="button pause" onclick="pause()">Pause</button>
+            <button class="button resume" onclick="resume()">Resume</button>
+            <button class="button reset" onclick="reset()">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval;
+        let isRunning = false;
+        let isPaused = false;
+        let pauseTime = 0;
+
+        function formatTime(ms) {
+            let totalSeconds = Math.floor(ms / 1000);
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('display');
+            display.textContent = formatTime(elapsedTime);
+        }
+
+        function start() {
+            if (!isRunning) {
+                isRunning = true;
+                startTime = Date.now();
+                if (isPaused) {
+                    startTime = Date.now() - pauseTime;
+                }
+                timerInterval = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay();
+                }, 1000);
+                isPaused = false;
+            }
+        }
+
+        function pause() {
+            if (isRunning && !isPaused) {
+                clearInterval(timerInterval);
+                pauseTime = Date.now() - startTime;
+                isPaused = true;
+            }
+        }
+
+        function resume() {
+            if (isRunning && isPaused) {
+                startTime = Date.now() - pauseTime;
+                timerInterval = setInterval(() => {
+                    elapsedTime = Date.now() - startTime;
+                    updateDisplay();
+                }, 1000);
+                isPaused = false;
+            }
+        }
+
+        function reset() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            isPaused = false;
+            elapsedTime = 0;
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>
